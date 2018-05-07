@@ -1,4 +1,44 @@
 [[package]]
+name = "dtoa"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "itoa"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "netflood"
 version = "0.1.0"
+dependencies = [
+ "netflow 0.1.0 (git+https://github.com/4hiziri/rust-netflow.git)",
+ "serde_json 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
+[[package]]
+name = "netflow"
+version = "0.1.0"
+source = "git+https://github.com/4hiziri/rust-netflow.git#6cd9e5e9904edfa441b1f72618515fd517bcffd3"
+
+[[package]]
+name = "serde"
+version = "1.0.46"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "serde_json"
+version = "1.0.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "dtoa 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "itoa 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.46 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[metadata]
+"checksum dtoa 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "09c3753c3db574d215cba4ea76018483895d7bff25a31b49ba45db21c48e50ab"
+"checksum itoa 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c069bbec61e1ca5a596166e55dfe4773ff745c3d16b700013bcaff9a6df2c682"
+"checksum netflow 0.1.0 (git+https://github.com/4hiziri/rust-netflow.git)" = "<none>"
+"checksum serde 1.0.46 (registry+https://github.com/rust-lang/crates.io-index)" = "40916f132d93723c5b744f50de984e4c90a43a391b6af9273fcda5f06e28f001"
+"checksum serde_json 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)" = "f3ad6d546e765177cf3dded3c2e424a8040f870083a0e64064746b958ece9cb1"

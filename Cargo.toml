@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["tkgsy <meirvg@gmail.com>"]
 
 [dependencies]
+serde_json = "1.0"
+netflow = { git = "https://github.com/4hiziri/rust-netflow.git" }
