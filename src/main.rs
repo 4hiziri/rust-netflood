@@ -7,20 +7,18 @@ use std::io::BufReader;
 use std::fs::File;
 
 use netflood::template_parser;
+use netflood::pcap_analysis;
 
 fn main() {
-    let bufr = BufReader::new(
+    let mut bufr = BufReader::new(
         File::open(
             "/home/tkgsy/misc/scripts/netflood/netflood/rsc/template/template.json",
         ).unwrap(),
     );
 
-    let val: serde_json::Value = serde_json::from_reader(bufr).unwrap();
-
-    println!("{:?}", val);
-
-    println!(
-        "{:?}",
-        template_parser::from_str("{\"name\": \"John Doe\"}")
+    println!("{:?}", template_parser::from_reader(&mut bufr));
+    pcap_analysis::dump_data_template(
+        "/home/tkgsy/misc/scripts/netflood/netflood/rsc/netflows.pcapng",
+        2055,
     );
 }
