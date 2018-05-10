@@ -8,3 +8,5 @@ serde_json = "1.0"
 netflow = { git = "https://github.com/4hiziri/rust-netflow.git" }
 pcapng = {git = "https://github.com/kornholi/pcapng.git"}
 pnet = "0.21.0"
+log = ""
+env_logger = ""
