@@ -2,6 +2,9 @@
 extern crate netflow;
 extern crate serde_json;
 extern crate netflood;
+#[macro_use]
+extern crate log;
+extern crate env_logger;
 
 use std::io::BufReader;
 use std::fs::File;
@@ -9,16 +12,22 @@ use std::fs::File;
 use netflood::template_parser;
 use netflood::pcap_analysis;
 
-fn main() {
-    let mut bufr = BufReader::new(
-        File::open(
-            "/home/tkgsy/misc/scripts/netflood/netflood/rsc/template/template.json",
-        ).unwrap(),
-    );
+use netflow::flowset::NetFlow9;
 
-    println!("{:?}", template_parser::from_reader(&mut bufr));
-    pcap_analysis::dump_data_template(
-        "/home/tkgsy/misc/scripts/netflood/netflood/rsc/netflows.pcapng",
-        2055,
-    );
+fn main() {
+    env_logger::init();
+
+    let mut bufr = BufReader::new(File::open("./rsc/template/template.json").unwrap());
+
+    let tmps = template_parser::from_reader(&mut bufr);
+
+    let flows = pcap_analysis::dump_data_template("./rsc/netflows.pcapng", 2055);
+    println!("Flowsets num: {}", flows.len());
+
+    let netflow9: Vec<NetFlow9> = flows
+        .into_iter()
+        .map(|flow| NetFlow9::new(&flow).unwrap())
+        .collect();
+
+    println!("netflow9: {:?}", netflow9);
 }
