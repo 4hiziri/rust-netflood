@@ -78,6 +78,14 @@ dependencies = [
 
 [[package]]
 name = "memchr"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "memchr"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
@@ -97,7 +105,19 @@ dependencies = [
 [[package]]
 name = "netflow"
 version = "0.1.0"
-source = "git+https://github.com/4hiziri/rust-netflow.git#344495042c14576899b81135a6e799011caf09c8"
+source = "git+https://github.com/4hiziri/rust-netflow.git#2833ee60003c0968799caa038f2c495da9180ea2"
+dependencies = [
+ "byteorder 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nom 3.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "nom"
+version = "3.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "memchr 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "pcapng"
@@ -352,8 +372,10 @@ dependencies = [
 "checksum libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)" = "6fd41f331ac7c5b8ac259b8bf82c75c0fb2e469bbf37d2becbba9a6a2221965b"
 "checksum log 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)" = "e19e8d5c34a3e0e2223db8e060f9e8264aeeb5c5fc64a4ee9965c062211c024b"
 "checksum log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "89f010e843f2b1a31dbd316b3b8d443758bc634bed37aabade59c686d644e0a2"
+"checksum memchr 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "148fab2e51b4f1cfc66da2a7c32981d1d3c083a803978268bb11fe4b86925e7a"
 "checksum memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "796fba70e76612589ed2ce7f45282f5af869e0fdd7cc6199fa1aa1f1d591ba9d"
 "checksum netflow 0.1.0 (git+https://github.com/4hiziri/rust-netflow.git)" = "<none>"
+"checksum nom 3.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "05aec50c70fd288702bcd93284a8444607f3292dbdf2a30de5ea5dcdbe72287b"
 "checksum pcapng 0.0.1 (git+https://github.com/kornholi/pcapng.git)" = "<none>"
 "checksum pnet 0.21.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7f3961c514be0c95233bdccdee9831aadd887a889ebc22e57d73e14d1cedb670"
 "checksum pnet_base 0.21.0 (registry+https://github.com/rust-lang/crates.io-index)" = "948dbdd36f46888ada1d497703e6cae53d227ab0e8871638aba492ad1e4a76dc"
