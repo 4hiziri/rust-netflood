@@ -24,10 +24,15 @@ fn main() {
     let flows = pcap_analysis::dump_data_template("./rsc/netflows.pcapng", 2055);
     println!("Flowsets num: {}", flows.len());
 
-    let netflow9: Vec<NetFlow9> = flows
-        .into_iter()
-        .map(|flow| NetFlow9::new(&flow).unwrap())
-        .collect();
+    for flow in flows {
+        let netflow = NetFlow9::new(&flow).unwrap();
+        println!("NetFlow9: {:?}", netflow);
+    }
 
-    println!("netflow9: {:?}", netflow9);
+    // let netflow9: Vec<NetFlow9> = flows
+    //     .into_iter()
+    //     .map(|flow| NetFlow9::new(&flow).unwrap())
+    //     .collect();
+
+    // println!("netflow9: {:?}", netflow9);
 }
