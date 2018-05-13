@@ -2,6 +2,7 @@
 extern crate netflow;
 extern crate serde_json;
 extern crate netflood;
+#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 extern crate env_logger;
@@ -19,20 +20,16 @@ fn main() {
 
     let mut bufr = BufReader::new(File::open("./rsc/template/template.json").unwrap());
 
-    let tmps = template_parser::from_reader(&mut bufr);
+    let _tmps = template_parser::from_reader(&mut bufr);
 
     let flows = pcap_analysis::dump_data_template("./rsc/netflows.pcapng", 2055);
     println!("Flowsets num: {}", flows.len());
 
-    for flow in flows {
-        let netflow = NetFlow9::new(&flow).unwrap();
-        println!("NetFlow9: {:?}", netflow);
-    }
+    let netflow9: Vec<NetFlow9> = flows
+        .into_iter()
+        .map(|flow| NetFlow9::from_bytes(&flow).unwrap())
+        .collect();
 
-    // let netflow9: Vec<NetFlow9> = flows
-    //     .into_iter()
-    //     .map(|flow| NetFlow9::new(&flow).unwrap())
-    //     .collect();
-
-    // println!("netflow9: {:?}", netflow9);
+    println!("flows num: {}", netflow9.len());
+    println!("flow: {:?}", netflow9[16].flow_sets[0]);
 }
