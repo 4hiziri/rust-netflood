@@ -13,7 +13,7 @@ use std::fs::File;
 use netflood::template_parser;
 use netflood::pcap_analysis;
 
-use netflow::flowset::NetFlow9;
+use netflow::netflow::NetFlow9;
 
 fn main() {
     env_logger::init();
