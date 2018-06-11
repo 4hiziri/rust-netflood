@@ -10,7 +10,7 @@ extern crate env_logger;
 use std::fs::File;
 use std::io::BufReader;
 
-use netflow::flowset::{DataTemplate, DataTemplateItem, FlowSet};
+use netflow::flowset::{DataTemplate, DataTemplateItem, FlowSet, OptionTemplateItem};
 use netflow::netflow::NetFlow9;
 
 use netflood::pcap_analysis;
@@ -20,50 +20,73 @@ use netflood::template_parser;
 // + extract template from pcap
 // + send netflow by json, xml or something
 
-// TODO: divide Template and Option?
-// Return Data Template or Option Template
+fn is_contained_template(vec: &Vec<DataTemplateItem>, item: &DataTemplateItem) -> bool {
+    vec.into_iter().fold(false, |is_contained, i| {
+        is_contained || i.template_id == item.template_id
+    })
+}
+
+fn is_contained_option(vec: &Vec<OptionTemplateItem>, item: &OptionTemplateItem) -> bool {
+    vec.into_iter().fold(false, |is_contained, i| {
+        is_contained || i.template_id == item.template_id
+    })
+}
+
+// Return DataTemplateItem for extract and dump template
 fn extract_template(filename: &str) -> Vec<DataTemplateItem> {
-    let netflow_packets: Vec<Vec<u8>> = pcap_analysis::dump_netflow(filename, 2055);
-    let template_flows: Vec<DataTemplateItem> = netflow_packets
+    let templates = pcap_analysis::dump_netflow(filename, 2055)
         .into_iter()
         .map(|packets| NetFlow9::from_bytes(&packets).unwrap())
-        .fold(Vec::new(), |mut acc_flowsets, netflow| {
-            acc_flowsets.append(&mut netflow.flow_sets.into_iter().fold(
-                Vec::new(),
-                |mut acc, set| match set {
-                    FlowSet::DataTemplate(temp) => {
-                        acc.push(temp);
-                        acc
-                    }
-                    _ => acc,
-                },
-            ));
-
-            acc_flowsets
-        })
-        .into_iter()
-        .fold(Vec::new(), |mut acc, mut data_template| {
-            acc.append(data_template.templates.as_mut());
-            acc
-        })
-        .into_iter()
-        .fold(Vec::new(), |mut acc, item| {
-            let is_contained = {
-                let acc = &acc;
-                acc.into_iter().fold(false, |is_contained, i| {
-                    is_contained || i.template_id == item.template_id
+        .flat_map(|netflow| {
+            netflow
+                .flow_sets
+                .into_iter()
+                .map(|set| match set {
+                    FlowSet::DataTemplate(temp) => Some(temp),
+                    _ => None,
                 })
-            };
+                .filter(|opt| opt.is_some())
+                .map(|some| some.unwrap())
+        })
+        .flat_map(|data_temp| data_temp.templates);
 
-            if is_contained {
-                acc
-            } else {
-                acc.push(item);
-                acc
-            }
-        });
+    // remove duplicates
+    templates.into_iter().fold(Vec::new(), |mut acc, item| {
+        if is_contained_template(&acc, &item) {
+            acc
+        } else {
+            acc.push(item);
+            acc
+        }
+    })
+}
 
-    template_flows // .collect()
+fn extract_option(filename: &str) -> Vec<OptionTemplateItem> {
+    let templates = pcap_analysis::dump_netflow(filename, 2055)
+        .into_iter()
+        .map(|packets| NetFlow9::from_bytes(&packets).unwrap())
+        .flat_map(|netflow| {
+            netflow
+                .flow_sets
+                .into_iter()
+                .map(|set| match set {
+                    FlowSet::OptionTemplate(temp) => Some(temp),
+                    _ => None,
+                })
+                .filter(|opt| opt.is_some())
+                .map(|some| some.unwrap())
+        })
+        .map(|data_temp| data_temp.templates);
+
+    // remove duplicates
+    templates.into_iter().fold(Vec::new(), |mut acc, item| {
+        if is_contained_option(&acc, &item) {
+            acc
+        } else {
+            acc.push(item);
+            acc
+        }
+    })
 }
 
 fn main() {
@@ -77,19 +100,19 @@ fn main() {
     // let flows = pcap_analysis::dump_netflow("./rsc/netflows.pcapng", 2055);
     // println!("Flowsets num: {}", flows.len());
 
-    let netflows = extract_template(pcap_file);
-    println!("len: {:?}", netflows.len());
-    println!("netflows: {:?}", netflows[0]);
+    let templates = extract_template(pcap_file);
+    println!("len: {:?}", templates.len());
+    println!("netflows: {:?}", templates[0]);
 
-    for flow in netflows {
-        println!("Template ID: {}", flow.template_id);
+    for temp in templates {
+        println!("Template ID: {}", temp.template_id);
     }
 
-    // let netflow9: Vec<NetFlow9> = flows
-    //     .into_iter()
-    //     .map(|flow| NetFlow9::from_bytes(&flow).unwrap())
-    //     .collect();
+    let options = extract_option(pcap_file);
+    println!("len: {:?}", options.len());
+    println!("netflows: {:?}", options[0]);
 
-    // println!("flows num: {}", netflow9.len());
-    // println!("flow: {:?}", netflow9[16].flow_sets[0]);
+    for opt in options {
+        println!("Template ID: {}", opt.template_id);
+    }
 }
