@@ -89,6 +89,7 @@ fn extract_option(filename: &str) -> Vec<OptionTemplateItem> {
     })
 }
 
+// TODO: add arguments parser
 fn main() {
     env_logger::init();
 
