@@ -13,6 +13,7 @@ use std::io::BufReader;
 use netflow::flowset::{DataTemplate, DataTemplateItem, FlowSet, OptionTemplateItem};
 use netflow::netflow::NetFlow9;
 
+use netflood::json_dump;
 use netflood::pcap_analysis;
 use netflood::template_parser;
 
@@ -105,7 +106,7 @@ fn main() {
     println!("len: {:?}", templates.len());
     println!("netflows: {:?}", templates[0]);
 
-    for temp in templates {
+    for temp in &templates {
         println!("Template ID: {}", temp.template_id);
     }
 
@@ -113,7 +114,10 @@ fn main() {
     println!("len: {:?}", options.len());
     println!("netflows: {:?}", options[0]);
 
-    for opt in options {
+    for opt in &options {
         println!("Template ID: {}", opt.template_id);
     }
+
+    println!("json test");
+    json_dump::dump_template(&templates[0]);
 }
