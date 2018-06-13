@@ -1,19 +1,19 @@
 // https://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html
+extern crate netflood;
 extern crate netflow;
 extern crate serde_json;
-extern crate netflood;
 #[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 extern crate env_logger;
 
-use std::io::BufReader;
 use std::fs::File;
+use std::io::BufReader;
 
-use netflood::template_parser;
 use netflood::pcap_analysis;
+use netflood::template_parser;
 
-use netflow::flowset::NetFlow9;
+use netflow::netflow::NetFlow9;
 
 fn main() {
     env_logger::init();
