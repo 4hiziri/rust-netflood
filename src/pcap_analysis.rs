@@ -1,16 +1,15 @@
 use pcapng;
 
-use pnet::packet::ethernet::{EthernetPacket, EtherType};
+use pnet::packet::ethernet::{EtherType, EthernetPacket};
+use pnet::packet::ip::{IpNextHeaderProtocol, IpNextHeaderProtocols};
 use pnet::packet::ipv4::Ipv4Packet;
 use pnet::packet::ipv6::Ipv6Packet;
-use pnet::packet::ip::{IpNextHeaderProtocols, IpNextHeaderProtocol};
-use pnet::packet::FromPacket;
 use pnet::packet::udp::UdpPacket;
+use pnet::packet::FromPacket;
 
-
-use std::fs::File;
 use std::error;
 use std::fmt;
+use std::fs::File;
 
 type L2Payload = (EtherType, Vec<u8>);
 type L3Payload = (IpNextHeaderProtocol, Vec<u8>);
@@ -60,18 +59,14 @@ fn get_l3_payload(ethertype: EtherType, packet: &[u8]) -> Result<L3Payload, Erro
 
     // FIXME: use enum?
     match ethertype {
-        EtherType(ethertype) if ethertype == ipv4_ethertype => {
-            match Ipv4Packet::new(&packet) {
-                Some(p4) => Ok((p4.get_next_level_protocol(), p4.from_packet().payload)),
-                None => Err(Error::new(3)),
-            }
-        }
-        EtherType(ethertype) if ethertype == ipv6_ethertype => {
-            match Ipv6Packet::new(&packet) {
-                Some(p6) => Ok((p6.get_next_header(), p6.from_packet().payload)),
-                None => Err(Error::new(3)),
-            }
-        }
+        EtherType(ethertype) if ethertype == ipv4_ethertype => match Ipv4Packet::new(&packet) {
+            Some(p4) => Ok((p4.get_next_level_protocol(), p4.from_packet().payload)),
+            None => Err(Error::new(3)),
+        },
+        EtherType(ethertype) if ethertype == ipv6_ethertype => match Ipv6Packet::new(&packet) {
+            Some(p6) => Ok((p6.get_next_header(), p6.from_packet().payload)),
+            None => Err(Error::new(3)),
+        },
         _ => Err(Error::new(3)),
     }
 }
@@ -94,26 +89,24 @@ fn get_netflow(collector_port: u16, link_type: u16, packet: &[u8]) -> Result<Vec
     get_l2_payload(link_type, packet)
         .and_then(|(ethertype, packet)| get_l3_payload(ethertype, &packet))
         .and_then(|(ip_next, packet)| get_l4_payload(ip_next, &packet))
-        .and_then(|(port, payload)| if port == collector_port {
-            Ok(payload)
-        } else {
-            Err(Error::new(5))
+        .and_then(|(port, payload)| {
+            if port == collector_port {
+                Ok(payload)
+            } else {
+                Err(Error::new(5))
+            }
         })
 }
 
 /// Extract data template of Netflow version 9 from pcap file
-pub fn dump_data_template(filename: &str, collector_port: u16) -> Vec<Vec<u8>> {
+pub fn dump_netflow(filename: &str, collector_port: u16) -> Vec<Vec<u8>> {
     let mut fd = File::open(filename).unwrap();
     let mut reader = pcapng::SimpleReader::new(&mut fd);
 
-    let flowset = reader
+    reader
         .packets()
-        .map(|(iface, packet)| {
-            get_netflow(collector_port, iface.link_type, &packet.data[..])
-        })
+        .map(|(iface, packet)| get_netflow(collector_port, iface.link_type, &packet.data[..]))
         .filter(|res| res.is_ok())
         .map(|res| res.unwrap())
-        .collect();
-
-    flowset
+        .collect()
 }
