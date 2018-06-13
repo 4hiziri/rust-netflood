@@ -7,10 +7,10 @@ extern crate serde_json;
 extern crate log;
 extern crate env_logger;
 
-use std::fs::File;
-use std::io::BufReader;
 use netflow::flowset::{DataTemplate, DataTemplateItem, FlowSet, OptionTemplateItem};
 use netflow::netflow::NetFlow9;
+use std::fs::File;
+use std::io::BufReader;
 
 use netflood::json_dump;
 use netflood::pcap_analysis;
@@ -77,7 +77,6 @@ fn extract_option(filename: &str) -> Vec<OptionTemplateItem> {
                 .map(|some| some.unwrap())
         })
         .map(|data_temp| data_temp.templates);
->>>>>>> a4778217bb34a507826c82f95b31e514e1e29483
 
     // remove duplicates
     templates.into_iter().fold(Vec::new(), |mut acc, item| {
