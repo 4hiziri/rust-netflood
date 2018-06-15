@@ -6,15 +6,16 @@ extern crate serde_json;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
+#[macro_use]
+extern crate clap;
 
-use netflow::flowset::{DataTemplate, DataTemplateItem, FlowSet, OptionTemplateItem};
+use clap::App;
+
+use netflow::flowset::{DataTemplateItem, FlowSet, OptionTemplateItem};
 use netflow::netflow::NetFlow9;
-use std::fs::File;
-use std::io::BufReader;
 
 use netflood::json_dump;
 use netflood::pcap_analysis;
-use netflood::template_parser;
 
 // Need cmd
 // + extract template from pcap
@@ -89,34 +90,66 @@ fn extract_option(filename: &str) -> Vec<OptionTemplateItem> {
     })
 }
 
-// TODO: add arguments parser
+fn extract_cmd(matches: &clap::ArgMatches) {
+    match matches.subcommand() {
+        ("template", Some(matches)) => {
+            debug!("extract template");
+
+            let pcap = matches.value_of("PCAP").unwrap();
+            let templates = extract_template(pcap);
+
+            debug!("len: {:?}", templates.len());
+            debug!("netflows: {:?}", templates[0]);
+
+            let temp_json = json_dump::dump_template(&templates).unwrap();
+
+            println!("{}", &temp_json);
+        }
+        ("option", Some(matches)) => {
+            debug!("extract option");
+
+            let pcap = matches.value_of("PCAP").unwrap();
+            let options = extract_option(pcap);
+
+            debug!("len: {:?}", options.len());
+            debug!("netflows: {:?}", options[0]);
+
+            let opt_json = json_dump::dump_option(&options).unwrap();
+            println!("{}", &opt_json);
+        }
+        _ => {
+            println!("ERROR! sorry I forgot implementing.");
+        }
+    }
+}
+
 fn main() {
     env_logger::init();
 
-    let template_name = "./rsc/template/template.json";
-    let pcap_file = "./rsc/netflows.pcapng";
+    let yaml = load_yaml!("opt.yml");
+    let app = App::from_yaml(yaml)
+        .name(crate_name!())
+        .version(crate_version!())
+        .about(crate_description!())
+        .author(crate_authors!());
 
+    match app.get_matches().subcommand() {
+        ("extract", Some(matches)) => {
+            debug!("extract cmd");
+
+            extract_cmd(matches);
+        }
+        ("generate", Some(_matches)) => {
+            debug!("generate cmd");
+        }
+        _ => {
+            debug!("not specified"); // show help?
+        }
+    }
+
+    // let template_name = "./rsc/template/template.json";
     // let mut bufr = BufReader::new(File::open(filename).unwrap());
     // let _tmps = template_parser::from_reader(&mut bufr);
     // let flows = pcap_analysis::dump_netflow("./rsc/netflows.pcapng", 2055);
     // println!("Flowsets num: {}", flows.len());
-
-    let templates = extract_template(pcap_file);
-    println!("len: {:?}", templates.len());
-    println!("netflows: {:?}", templates[0]);
-
-    for temp in &templates {
-        println!("Template ID: {}", temp.template_id);
-    }
-
-    let options = extract_option(pcap_file);
-    println!("len: {:?}", options.len());
-    println!("netflows: {:?}", options[0]);
-
-    for opt in &options {
-        println!("Template ID: {}", opt.template_id);
-    }
-
-    println!("json test");
-    json_dump::dump_template(&templates[0]);
 }

@@ -1,0 +1,27 @@
+name: netflood
+subcommands:
+  - extract:
+      abount: Extract netflow information from pcap file
+      visible_alias: e      
+      subcommands:
+        - template:
+            about: extract Data Template flowsets
+            args:
+              - PCAP:
+                  help: pcap file
+                  required: true
+                  index: 1
+        - option:
+            about: extract Option Template flowsets
+            args:
+              - PCAP:
+                  help: pcap file
+                  required: true
+                  index: 1
+  - generate:
+      about: Generate netflow and send
+      visible_alias: g
+      args:
+        - TEMPLATE:
+            help: template json file for generating netflow-v9 packet
+            required: true

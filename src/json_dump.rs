@@ -1,16 +1,14 @@
 use netflow::flowset::{DataTemplateItem, OptionTemplateItem};
-use serde_json;
+use serde_json::Error;
 
-pub fn dump_template(template: &DataTemplateItem) -> Result<(), serde_json::Error> {
+pub fn dump_template(template: &Vec<DataTemplateItem>) -> Result<String, Error> {
     let val = json!(template);
-    println!("json: {}", val);
 
-    // let val2 = serde_json::to_vec(&template.fields);
-    // println!("json: {:?}", val2);
-
-    Ok(())
+    Ok(val.to_string())
 }
 
-// pub fn dump_option(template: DataTemplateItem) -> Result<(), serde_json::Error> {
+pub fn dump_option(option: &Vec<OptionTemplateItem>) -> Result<String, Error> {
+    let val = json!(option);
 
-// }
+    Ok(val.to_string())
+}
