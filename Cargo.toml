@@ -10,3 +10,4 @@ pcapng = {git = "https://github.com/kornholi/pcapng.git"}
 pnet = "0.21.0"
 log = ""
 env_logger = ""
+clap = {version = "~2.27.0", features = ["yaml"]}
