@@ -11,86 +11,32 @@ extern crate clap;
 
 use clap::App;
 
-use netflow::flowset::{DataTemplateItem, FlowSet, OptionTemplateItem};
-use netflow::netflow::NetFlow9;
-
 use netflood::json_dump;
-use netflood::pcap_analysis;
+use netflood::template_parser::{extract_option, extract_template};
 
 // Need cmd
 // + extract template from pcap
 // + send netflow by json, xml or something
 
-fn is_contained_template(vec: &Vec<DataTemplateItem>, item: &DataTemplateItem) -> bool {
-    vec.into_iter().fold(false, |is_contained, i| {
-        is_contained || i.template_id == item.template_id
-    })
+fn cmd_generate(matches: &clap::ArgMatches) {
+    let template = if let Some(template) = matches.value_of("template") {
+        Some(json_dump::json_template(template))
+    } else {
+        None
+    };
+
+    let option = if let Some(option) = matches.value_of("option") {
+        Some(json_dump::json_option(option))
+    } else {
+        None
+    };
+
+    debug!("template: {:?}", template);
+    debug!("option: {:?}", option);
 }
 
-fn is_contained_option(vec: &Vec<OptionTemplateItem>, item: &OptionTemplateItem) -> bool {
-    vec.into_iter().fold(false, |is_contained, i| {
-        is_contained || i.template_id == item.template_id
-    })
-}
-
-// Return DataTemplateItem for extract and dump template
-fn extract_template(filename: &str) -> Vec<DataTemplateItem> {
-    let templates = pcap_analysis::dump_netflow(filename, 2055)
-        .into_iter()
-        .map(|packets| NetFlow9::from_bytes(&packets).unwrap())
-        .flat_map(|netflow| {
-            netflow
-                .flow_sets
-                .into_iter()
-                .map(|set| match set {
-                    FlowSet::DataTemplate(temp) => Some(temp),
-                    _ => None,
-                })
-                .filter(|opt| opt.is_some())
-                .map(|some| some.unwrap())
-        })
-        .flat_map(|data_temp| data_temp.templates);
-
-    // remove duplicates
-    templates.into_iter().fold(Vec::new(), |mut acc, item| {
-        if is_contained_template(&acc, &item) {
-            acc
-        } else {
-            acc.push(item);
-            acc
-        }
-    })
-}
-
-fn extract_option(filename: &str) -> Vec<OptionTemplateItem> {
-    let templates = pcap_analysis::dump_netflow(filename, 2055)
-        .into_iter()
-        .map(|packets| NetFlow9::from_bytes(&packets).unwrap())
-        .flat_map(|netflow| {
-            netflow
-                .flow_sets
-                .into_iter()
-                .map(|set| match set {
-                    FlowSet::OptionTemplate(temp) => Some(temp),
-                    _ => None,
-                })
-                .filter(|opt| opt.is_some())
-                .map(|some| some.unwrap())
-        })
-        .map(|data_temp| data_temp.templates);
-
-    // remove duplicates
-    templates.into_iter().fold(Vec::new(), |mut acc, item| {
-        if is_contained_option(&acc, &item) {
-            acc
-        } else {
-            acc.push(item);
-            acc
-        }
-    })
-}
-
-fn extract_cmd(matches: &clap::ArgMatches) {
+fn cmd_extract(matches: &clap::ArgMatches) {
+    // TODO: add human-readable format
     match matches.subcommand() {
         ("template", Some(matches)) => {
             debug!("extract template");
@@ -127,24 +73,25 @@ fn main() {
     env_logger::init();
 
     let yaml = load_yaml!("opt.yml");
-    let app = App::from_yaml(yaml)
+    let matches = App::from_yaml(yaml)
         .name(crate_name!())
         .version(crate_version!())
         .about(crate_description!())
-        .author(crate_authors!());
+        .author(crate_authors!())
+        .get_matches();
 
-    match app.get_matches().subcommand() {
+    match matches.subcommand() {
         ("extract", Some(matches)) => {
             debug!("extract cmd");
 
-            extract_cmd(matches);
+            cmd_extract(matches);
         }
-        ("generate", Some(_matches)) => {
+        ("generate", Some(matches)) => {
             debug!("generate cmd");
+
+            cmd_generate(matches);
         }
-        _ => {
-            debug!("not specified"); // show help?
-        }
+        _ => println!("{}", matches.usage()),
     }
 
     // let template_name = "./rsc/template/template.json";
