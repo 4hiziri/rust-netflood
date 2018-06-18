@@ -22,6 +22,13 @@ subcommands:
       about: Generate netflow and send
       visible_alias: g
       args:
-        - TEMPLATE:
+        - template:            
             help: template json file for generating netflow-v9 packet
-            required: true
+            short: t
+            takes_value: true
+            multiple: true
+        - option:            
+            help: option json file for generating netflow-v9 packet
+            short: o
+            takes_value: true
+            multiple: true
