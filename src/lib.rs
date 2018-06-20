@@ -5,8 +5,8 @@ extern crate pnet;
 extern crate serde_json;
 extern crate rand;
 
+pub mod flow_generator;
 pub mod generate_rand;
 pub mod json_dump;
 pub mod pcap_analysis;
 pub mod template_parser;
-// pub mod flow_generate;

@@ -12,7 +12,7 @@ extern crate clap;
 
 use clap::App;
 
-use netflood::generate_rand;
+use netflood::flow_generator;
 use netflood::json_dump;
 use netflood::template_parser::{extract_option, extract_template};
 
@@ -22,6 +22,8 @@ use netflood::template_parser::{extract_option, extract_template};
 
 fn cmd_generate(matches: &clap::ArgMatches) {
     let default_count = 3; // TODO: set flow count
+    let flow_count = default_count;
+    let mut dataflow = Vec::new();
 
     let templates = if let Some(template) = matches.value_of("template") {
         Some(json_dump::json_template(template))
@@ -29,13 +31,20 @@ fn cmd_generate(matches: &clap::ArgMatches) {
         None
     };
 
+    if let Some(templates) = templates {
+        debug!("template: {:?}", templates);
+
+        for template in templates {
+            dataflow.append(&mut flow_generator::from_template(template, flow_count));
+        }
+    }
+
     let options = if let Some(option) = matches.value_of("option") {
         Some(json_dump::json_option(option))
     } else {
         None
     };
 
-    debug!("template: {:?}", templates);
     debug!("option: {:?}", options);
 }
 
