@@ -1,6 +1,7 @@
 // https://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html
 extern crate netflood;
 extern crate netflow;
+extern crate rand;
 extern crate serde_json;
 #[allow(unused_imports)]
 #[macro_use]
@@ -11,6 +12,7 @@ extern crate clap;
 
 use clap::App;
 
+use netflood::generate_rand;
 use netflood::json_dump;
 use netflood::template_parser::{extract_option, extract_template};
 
@@ -19,20 +21,22 @@ use netflood::template_parser::{extract_option, extract_template};
 // + send netflow by json, xml or something
 
 fn cmd_generate(matches: &clap::ArgMatches) {
-    let template = if let Some(template) = matches.value_of("template") {
+    let default_count = 3; // TODO: set flow count
+
+    let templates = if let Some(template) = matches.value_of("template") {
         Some(json_dump::json_template(template))
     } else {
         None
     };
 
-    let option = if let Some(option) = matches.value_of("option") {
+    let options = if let Some(option) = matches.value_of("option") {
         Some(json_dump::json_option(option))
     } else {
         None
     };
 
-    debug!("template: {:?}", template);
-    debug!("option: {:?}", option);
+    debug!("template: {:?}", templates);
+    debug!("option: {:?}", options);
 }
 
 fn cmd_extract(matches: &clap::ArgMatches) {

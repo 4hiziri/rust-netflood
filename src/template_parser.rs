@@ -4,6 +4,7 @@ use pcap_analysis;
 use serde_json;
 use std::io::Read;
 
+#[allow(dead_code)]
 fn from_str(template_str: &str) -> Result<DataTemplate, serde_json::Error> {
     match serde_json::from_str::<serde_json::Value>(template_str) {
         Ok(_val) => Ok(DataTemplate::new(0, Vec::new())),
@@ -11,6 +12,7 @@ fn from_str(template_str: &str) -> Result<DataTemplate, serde_json::Error> {
     }
 }
 
+#[allow(dead_code)]
 fn from_reader(template_reader: &mut Read) -> Result<DataTemplate, serde_json::Error> {
     match serde_json::from_reader::<&mut Read, serde_json::Value>(template_reader) {
         Ok(_val) => Ok(DataTemplate::new(0, Vec::new())),
