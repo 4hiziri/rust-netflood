@@ -15,43 +15,39 @@ use clap::App;
 use netflood::flow_generator;
 use netflood::json_dump;
 use netflood::template_parser::{extract_option, extract_template};
+use netflow::flowset::DataFlow;
 
 // Need cmd
-// + extract template from pcap
 // + send netflow by json, xml or something
+
+fn take_if_temp(dataflows: &mut Vec<DataFlow>, count: usize, template_file: Option<&str>) {
+    if let Some(templates) = template_file {
+        let templates = json_dump::json_template(templates);
+        debug!("template: {:?}", templates);
+
+        for temp in templates {
+            dataflows.append(&mut flow_generator::from_template(temp, count));
+        }
+    }
+}
+
+fn take_if_opt(dataflows: &mut Vec<DataFlow>, count: usize, template_file: Option<&str>) {
+    if let Some(templates) = template_file {
+        let templates = json_dump::json_option(templates);
+        debug!("template: {:?}", templates);
+
+        for temp in templates {
+            dataflows.append(&mut flow_generator::from_option(temp, count));
+        }
+    }
+}
 
 fn cmd_generate(matches: &clap::ArgMatches) {
     let default_count = 3; // TODO: set flow count
-    let flow_count = default_count;
     let mut dataflow = Vec::new();
 
-    let templates = if let Some(template) = matches.value_of("template") {
-        Some(json_dump::json_template(template))
-    } else {
-        None
-    };
-
-    if let Some(templates) = templates {
-        debug!("template: {:?}", templates);
-
-        for template in templates {
-            dataflow.append(&mut flow_generator::from_template(template, flow_count));
-        }
-    }
-
-    let options = if let Some(option) = matches.value_of("option") {
-        Some(json_dump::json_option(option))
-    } else {
-        None
-    };
-
-    if let Some(options) = options {
-        debug!("option: {:?}", options);
-
-        for option in options {
-            dataflow.append(&mut flow_generator::from_option(option, flow_count));
-        }
-    }
+    take_if_temp(&mut dataflow, default_count, matches.value_of("template"));
+    take_if_opt(&mut dataflow, default_count, matches.value_of("option"));
 
     debug!("DataFlow: {:?}", dataflow);
 }
