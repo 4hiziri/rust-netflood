@@ -45,7 +45,15 @@ fn cmd_generate(matches: &clap::ArgMatches) {
         None
     };
 
-    debug!("option: {:?}", options);
+    if let Some(options) = options {
+        debug!("option: {:?}", options);
+
+        for option in options {
+            dataflow.append(&mut flow_generator::from_option(option, flow_count));
+        }
+    }
+
+    debug!("DataFlow: {:?}", dataflow);
 }
 
 fn cmd_extract(matches: &clap::ArgMatches) {
