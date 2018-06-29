@@ -15,37 +15,31 @@ use clap::App;
 use netflood::flow_generator;
 use netflood::json_dump;
 use netflood::template_parser::{extract_option, extract_template};
+use netflow::flowset::DataFlow;
 
 use netflow::flowset::{DataFlow, DataTemplateItem, FlowSet, OptionTemplateItem};
 
 // Need cmd
-// + extract template from pcap
 // + send netflow by json, xml or something
 
-fn take_if_temp(
-    dataflows: &mut Vec<DataFlow>,
-    templates: Option<Vec<DataTemplateItem>>,
-    count: usize,
-) {
-    if let Some(templates) = templates {
+fn take_if_temp(dataflows: &mut Vec<DataFlow>, count: usize, template_file: Option<&str>) {
+    if let Some(templates) = template_file {
+        let templates = json_dump::json_template(templates);
         debug!("template: {:?}", templates);
 
-        for template in templates {
-            dataflows.append(&mut flow_generator::from_template(template, count));
+        for temp in templates {
+            dataflows.append(&mut flow_generator::from_template(temp, count));
         }
     }
 }
 
-fn take_if_opt(
-    dataflows: &mut Vec<DataFlow>,
-    options: Option<Vec<OptionTemplateItem>>,
-    count: usize,
-) {
-    if let Some(options) = options {
-        debug!("option: {:?}", options);
+fn take_if_opt(dataflows: &mut Vec<DataFlow>, count: usize, template_file: Option<&str>) {
+    if let Some(templates) = template_file {
+        let templates = json_dump::json_option(templates);
+        debug!("template: {:?}", templates);
 
-        for option in options {
-            dataflows.append(&mut flow_generator::from_option(option, count));
+        for temp in templates {
+            dataflows.append(&mut flow_generator::from_option(temp, count));
         }
     }
 }
@@ -54,28 +48,8 @@ fn cmd_generate(matches: &clap::ArgMatches) {
     let default_count = 3; // TODO: set flow count
     let mut dataflow = Vec::new();
 
-    let templates: Option<Vec<DataTemplateItem>> =
-        if let Some(template) = matches.value_of("template") {
-            Some(json_dump::json_template(template))
-        } else {
-            None
-        };
-
-    take_if_temp(&mut dataflow, templates, default_count);
-
-    let options = if let Some(option) = matches.value_of("option") {
-        Some(json_dump::json_option(option))
-    } else {
-        None
-    };
-
-    take_if_opt(&mut dataflow, options, default_count);
-
-    let flowset: Vec<FlowSet> = Vec::new();
-
-    if let Some(templates) = templates {
-        flowset.append(templates);
-    }
+    take_if_temp(&mut dataflow, default_count, matches.value_of("template"));
+    take_if_opt(&mut dataflow, default_count, matches.value_of("option"));
 
     debug!("DataFlow: {:?}", dataflow);
 }
