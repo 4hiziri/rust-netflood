@@ -17,8 +17,6 @@ use netflood::json_dump;
 use netflood::template_parser::{extract_option, extract_template};
 use netflow::flowset::DataFlow;
 
-use netflow::flowset::{DataFlow, DataTemplateItem, FlowSet, OptionTemplateItem};
-
 // Need cmd
 // + send netflow by json, xml or something
 
