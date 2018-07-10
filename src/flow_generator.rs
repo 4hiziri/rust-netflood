@@ -23,11 +23,11 @@ fn from_fields(id: u16, fields: &Vec<TypeLengthField>, count: usize) -> Vec<Data
     dataflow
 }
 
-pub fn from_template(template: DataTemplateItem, count: usize) -> Vec<DataFlow> {
+pub fn from_template(template: &DataTemplateItem, count: usize) -> Vec<DataFlow> {
     self::from_fields(template.template_id, &template.fields, count)
 }
 
-pub fn from_option(option: OptionTemplateItem, count: usize) -> Vec<DataFlow> {
+pub fn from_option(option: &OptionTemplateItem, count: usize) -> Vec<DataFlow> {
     let mut template = option.scopes.clone();
     template.append(&mut option.options.clone());
 
