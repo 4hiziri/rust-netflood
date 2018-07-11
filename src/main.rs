@@ -10,49 +10,82 @@ extern crate env_logger;
 #[macro_use]
 extern crate clap;
 
-use clap::App;
+use clap::{App, ArgMatches};
 
-use netflood::flow_generator;
+use netflood::flow_generator::{from_option, from_template};
 use netflood::json_dump;
 use netflood::template_parser::{extract_option, extract_template};
-use netflow::flowset::DataFlow;
+use netflow::flowset::{DataFlow, DataTemplate, FlowSet, OptionTemplate};
 
 // Need cmd
 // + send netflow by json, xml or something
 
-fn take_if_temp(dataflows: &mut Vec<DataFlow>, count: usize, template_file: Option<&str>) {
-    if let Some(templates) = template_file {
-        let templates = json_dump::json_template(templates);
-        debug!("template: {:?}", templates);
+fn get_template(template_file: &str) -> Option<DataTemplate> {
+    let temp_items = json_dump::json_template(template_file);
 
-        for temp in templates {
-            dataflows.append(&mut flow_generator::from_template(temp, count));
-        }
+    if temp_items.len() == 0 {
+        None
+    } else {
+        Some(DataTemplate::new(temp_items)) // delete dup
     }
 }
 
-fn take_if_opt(dataflows: &mut Vec<DataFlow>, count: usize, template_file: Option<&str>) {
+fn take_temp(count: usize, template: &DataTemplate) -> Vec<DataFlow> {
+    let mut dataflows = Vec::new();
+
+    for temp in &template.templates {
+        dataflows.append(&mut from_template(temp, count));
+    }
+
+    dataflows
+}
+
+fn get_option(option_file: &str) -> Option<Vec<OptionTemplate>> {
+    let options = json_dump::json_option(option_file);
+
+    if options.len() == 0 {
+        None
+    } else {
+        Some(
+            options
+                .into_iter()
+                .map(|option| OptionTemplate::new(option))
+                .collect(),
+        )
+    }
+}
+
+fn take_opt(count: usize, options: &Vec<OptionTemplate>) -> Vec<DataFlow> {
+    let mut datas = Vec::new();
+    let options = options.iter().map(|opt| &opt.templates);
+
+    for opt in options {
+        datas.append(&mut from_option(&opt, count));
+    }
+
+    datas
+}
+
+fn cmd_generate(matches: &ArgMatches) {
+    let default_count = 3; // TODO: set flow count
+                           // let mut dataflow = Vec::new();
+                           // let mut templates = Vec::new();
+                           // let mut options = Vec::new();
+
+    /*
     if let Some(templates) = template_file {
         let templates = json_dump::json_option(templates);
         debug!("template: {:?}", templates);
-
-        for temp in templates {
-            dataflows.append(&mut flow_generator::from_option(temp, count));
-        }
     }
+    */
+
+    // take_temp(&mut templates, default_count, matches.value_of("template"));
+    // take_opt(&mut options, default_count, matches.value_of("option"));
+
+    // debug!("DataFlow: {:?}", dataflow);
 }
 
-fn cmd_generate(matches: &clap::ArgMatches) {
-    let default_count = 3; // TODO: set flow count
-    let mut dataflow = Vec::new();
-
-    take_if_temp(&mut dataflow, default_count, matches.value_of("template"));
-    take_if_opt(&mut dataflow, default_count, matches.value_of("option"));
-
-    debug!("DataFlow: {:?}", dataflow);
-}
-
-fn cmd_extract(matches: &clap::ArgMatches) {
+fn cmd_extract(matches: &ArgMatches) {
     // TODO: add human-readable format
     match matches.subcommand() {
         ("template", Some(matches)) => {
