@@ -40,6 +40,7 @@ fn take_temp(count: usize, template: &DataTemplate) -> Vec<DataFlow> {
     dataflows
 }
 
+// FIXME: option is one at system?
 fn get_option(option_file: &str) -> Option<Vec<OptionTemplate>> {
     let options = json_dump::json_option(option_file);
 
@@ -68,21 +69,38 @@ fn take_opt(count: usize, options: &Vec<OptionTemplate>) -> Vec<DataFlow> {
 
 fn cmd_generate(matches: &ArgMatches) {
     let default_count = 3; // TODO: set flow count
-                           // let mut dataflow = Vec::new();
-                           // let mut templates = Vec::new();
-                           // let mut options = Vec::new();
+    let count = default_count;
+    let mut flowsets: Vec<FlowSet> = Vec::new();
 
-    /*
-    if let Some(templates) = template_file {
-        let templates = json_dump::json_option(templates);
-        debug!("template: {:?}", templates);
+    if let Some(template_file) = matches.value_of("template") {
+        if let Some(template) = get_template(template_file) {
+            debug!("template: {:?}", template);
+
+            let dataflows = take_temp(count, &template);
+            flowsets.push(FlowSet::from(template));
+
+            for flow in dataflows {
+                flowsets.push(FlowSet::from(flow));
+            }
+        }
     }
-    */
 
-    // take_temp(&mut templates, default_count, matches.value_of("template"));
-    // take_opt(&mut options, default_count, matches.value_of("option"));
+    if let Some(option_file) = matches.value_of("option") {
+        if let Some(options) = get_option(option_file) {
+            debug!("options: {:?}", options);
 
-    // debug!("DataFlow: {:?}", dataflow);
+            let dataflows = take_opt(count, &options);
+            for option in options {
+                flowsets.push(FlowSet::from(option));
+            }
+
+            for flow in dataflows {
+                flowsets.push(FlowSet::from(flow));
+            }
+        }
+    }
+
+    debug!("FlowSets: {:?}", flowsets);
 }
 
 fn cmd_extract(matches: &ArgMatches) {
