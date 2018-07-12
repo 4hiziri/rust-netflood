@@ -9,13 +9,18 @@ extern crate log;
 extern crate env_logger;
 #[macro_use]
 extern crate clap;
+extern crate time;
 
 use clap::{App, ArgMatches};
 
 use netflood::flow_generator::{from_option, from_template};
 use netflood::json_dump;
+use netflood::sender;
 use netflood::template_parser::{extract_option, extract_template};
 use netflow::flowset::{DataFlow, DataTemplate, FlowSet, OptionTemplate};
+use netflow::netflow::NetFlow9;
+
+use std::time::{SystemTime, UNIX_EPOCH};
 
 // Need cmd
 // + send netflow by json, xml or something
@@ -71,13 +76,14 @@ fn cmd_generate(matches: &ArgMatches) {
     let default_count = 3; // TODO: set flow count
     let count = default_count;
     let mut flowsets: Vec<FlowSet> = Vec::new();
+    let mut templates: Vec<FlowSet> = Vec::new();
 
     if let Some(template_file) = matches.value_of("template") {
         if let Some(template) = get_template(template_file) {
             debug!("template: {:?}", template);
 
             let dataflows = take_temp(count, &template);
-            flowsets.push(FlowSet::from(template));
+            templates.push(FlowSet::from(template));
 
             for flow in dataflows {
                 flowsets.push(FlowSet::from(flow));
@@ -91,7 +97,7 @@ fn cmd_generate(matches: &ArgMatches) {
 
             let dataflows = take_opt(count, &options);
             for option in options {
-                flowsets.push(FlowSet::from(option));
+                templates.push(FlowSet::from(option));
             }
 
             for flow in dataflows {
@@ -100,7 +106,34 @@ fn cmd_generate(matches: &ArgMatches) {
         }
     }
 
+    debug!("Templates: {:?}", templates);
     debug!("FlowSets: {:?}", flowsets);
+
+    let id = 1024;
+    let seq_num = 256;
+    let flow1 = NetFlow9::new(
+        100000,
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as u32,
+        seq_num,
+        id,
+        templates,
+    );
+    let flow2 = NetFlow9::new(
+        100000,
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as u32,
+        seq_num + 1,
+        id,
+        flowsets,
+    );
+
+    sender::send_netflow(flow1, "192.168.56.101", 2055);
+    sender::send_netflow(flow2, "192.168.56.101", 2055);
 }
 
 fn cmd_extract(matches: &ArgMatches) {
