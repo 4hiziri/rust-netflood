@@ -3,7 +3,6 @@ extern crate netflood;
 extern crate netflow;
 extern crate rand;
 extern crate serde_json;
-#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 extern crate env_logger;
@@ -132,8 +131,8 @@ fn cmd_generate(matches: &ArgMatches) {
         flowsets,
     );
 
-    sender::send_netflow(flow1, "192.168.56.101", 2055);
-    sender::send_netflow(flow2, "192.168.56.101", 2055);
+    sender::send_netflow(flow1, "192.168.56.101", 2055).unwrap();
+    sender::send_netflow(flow2, "192.168.56.101", 2055).unwrap();
 }
 
 fn cmd_extract(matches: &ArgMatches) {

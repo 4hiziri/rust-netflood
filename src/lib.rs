@@ -4,6 +4,8 @@ extern crate pnet;
 #[macro_use]
 extern crate serde_json;
 extern crate rand;
+#[macro_use]
+extern crate log;
 
 pub mod flow_generator;
 pub mod generate_rand;
