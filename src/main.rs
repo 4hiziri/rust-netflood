@@ -71,12 +71,14 @@ fn take_opt(count: usize, options: &Vec<OptionTemplate>) -> Vec<DataFlow> {
     datas
 }
 
+// TODO: design arguments and set data
 fn cmd_generate(matches: &ArgMatches) {
-    let default_count = 3; // TODO: set flow count
+    let default_count = 3;
     let count = default_count;
     let mut flowsets: Vec<FlowSet> = Vec::new();
     let mut templates: Vec<FlowSet> = Vec::new();
 
+    // FIXME: too long, extract
     if let Some(template_file) = matches.value_of("template") {
         if let Some(template) = get_template(template_file) {
             debug!("template: {:?}", template);
