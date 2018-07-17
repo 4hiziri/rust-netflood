@@ -23,12 +23,28 @@ subcommands:
       visible_alias: g
       args:
         - template:            
-            help: template json file for generating netflow-v9 packet
+            help: Data template json to generate netflow v9 packet
             short: t
             takes_value: true
             multiple: true
         - option:            
-            help: option json file for generating netflow-v9 packet
+            help: Option template json to generate netflow v9 packet
             short: o
             takes_value: true
             multiple: true
+        - dest-addr:
+            help: Destination address
+            required: true
+            takes_value: true
+        - count:
+            help: Num of dataflow per templates
+            default_value: "1"
+            takes_value: true
+        - id:
+            help: Netflow source ID
+            default_value: "1024"
+            takes_value: true
+        - seq-num:
+            help: Netflow initial sequence num
+            default_value: "10000"
+            take_value: true

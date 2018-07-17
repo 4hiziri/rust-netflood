@@ -61,51 +61,69 @@ fn get_option(option_file: &str) -> Option<Vec<OptionTemplate>> {
 }
 
 fn take_opt(count: usize, options: &Vec<OptionTemplate>) -> Vec<DataFlow> {
-    let mut datas = Vec::new();
+    let mut dataflows = Vec::new();
     let options = options.iter().map(|opt| &opt.templates);
 
     for opt in options {
-        datas.append(&mut from_option(&opt, count));
+        dataflows.append(&mut from_option(&opt, count));
     }
 
-    datas
+    dataflows
+}
+
+fn generate_from_data_template(matches: &ArgMatches, count: usize) -> (Vec<FlowSet>, Vec<FlowSet>) {
+    let mut flowsets: Vec<FlowSet> = Vec::new();
+    let mut templates: Vec<FlowSet> = Vec::new();
+
+    matches.value_of("template").map(|template_file| {
+        get_template(template_file).map(|template| {
+            debug!("template: {:?}", template);
+
+            for flow in take_temp(count, &template) {
+                flowsets.push(FlowSet::from(flow));
+            }
+
+            templates.push(FlowSet::from(template));
+        })
+    });
+
+    (flowsets, templates)
+}
+
+fn generate_from_option_template(
+    matches: &ArgMatches,
+    count: usize,
+) -> (Vec<FlowSet>, Vec<FlowSet>) {
+    let mut flowsets: Vec<FlowSet> = Vec::new();
+    let mut templates: Vec<FlowSet> = Vec::new();
+
+    matches.value_of("option").map(|option_file| {
+        get_option(option_file).map(|options| {
+            debug!("options: {:?}", options);
+
+            for flow in take_opt(count, &options) {
+                flowsets.push(FlowSet::from(flow));
+            }
+
+            for option in options {
+                templates.push(FlowSet::from(option));
+            }
+        })
+    });
+
+    (flowsets, templates)
 }
 
 // TODO: design arguments and set data
 fn cmd_generate(matches: &ArgMatches) {
-    let default_count = 3;
-    let count = default_count;
-    let mut flowsets: Vec<FlowSet> = Vec::new();
-    let mut templates: Vec<FlowSet> = Vec::new();
-
-    // FIXME: too long, extract
-    if let Some(template_file) = matches.value_of("template") {
-        if let Some(template) = get_template(template_file) {
-            debug!("template: {:?}", template);
-
-            let dataflows = take_temp(count, &template);
-            templates.push(FlowSet::from(template));
-
-            for flow in dataflows {
-                flowsets.push(FlowSet::from(flow));
-            }
-        }
-    }
-
-    if let Some(option_file) = matches.value_of("option") {
-        if let Some(options) = get_option(option_file) {
-            debug!("options: {:?}", options);
-
-            let dataflows = take_opt(count, &options);
-            for option in options {
-                templates.push(FlowSet::from(option));
-            }
-
-            for flow in dataflows {
-                flowsets.push(FlowSet::from(flow));
-            }
-        }
-    }
+    let count = match matches.value_of("count").unwrap().parse::<usize>() {
+        Ok(num) => num,
+        Err(e) => panic!("Error while parsing count: {:?}", e),
+    };
+    let (mut flowsets, mut templates) = generate_from_data_template(&matches, count);
+    let (mut opt_flows, mut opt_temps) = generate_from_option_template(&matches, count);
+    flowsets.append(&mut opt_flows);
+    templates.append(&mut opt_temps);
 
     debug!("Templates: {:?}", templates);
     debug!("FlowSets: {:?}", flowsets);
