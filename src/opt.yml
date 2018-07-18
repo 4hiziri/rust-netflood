@@ -32,7 +32,7 @@ subcommands:
             short: o
             takes_value: true
             multiple: true
-        - dest-addr:
+        - dst-addr:
             help: Destination address
             required: true
             takes_value: true
@@ -47,4 +47,4 @@ subcommands:
         - seq-num:
             help: Netflow initial sequence num
             default_value: "10000"
-            take_value: true
+            takes_value: true

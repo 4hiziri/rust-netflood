@@ -19,6 +19,8 @@ use netflood::template_parser::{extract_option, extract_template};
 use netflow::flowset::{DataFlow, DataTemplate, FlowSet, OptionTemplate};
 use netflow::netflow::NetFlow9;
 
+use std::net::IpAddr;
+use std::str::FromStr;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 // Need cmd
@@ -120,6 +122,10 @@ fn cmd_generate(matches: &ArgMatches) {
         Ok(num) => num,
         Err(e) => panic!("Error while parsing count: {:?}", e),
     };
+    let dst_addr = match IpAddr::from_str(matches.value_of("dst-addr").unwrap()) {
+        Ok(addr) => addr,
+        Err(_) => panic!("Error while parse dst-addr!"),
+    };
     let (mut flowsets, mut templates) = generate_from_data_template(&matches, count);
     let (mut opt_flows, mut opt_temps) = generate_from_option_template(&matches, count);
     flowsets.append(&mut opt_flows);
@@ -151,8 +157,8 @@ fn cmd_generate(matches: &ArgMatches) {
         flowsets,
     );
 
-    sender::send_netflow(flow1, "192.168.56.101", 2055).unwrap();
-    sender::send_netflow(flow2, "192.168.56.101", 2055).unwrap();
+    sender::send_netflow(flow1, dst_addr, 2055).unwrap();
+    sender::send_netflow(flow2, dst_addr, 2055).unwrap();
 }
 
 fn cmd_extract(matches: &ArgMatches) {
@@ -213,10 +219,4 @@ fn main() {
         }
         _ => println!("{}", matches.usage()),
     }
-
-    // let template_name = "./rsc/template/template.json";
-    // let mut bufr = BufReader::new(File::open(filename).unwrap());
-    // let _tmps = template_parser::from_reader(&mut bufr);
-    // let flows = pcap_analysis::dump_netflow("./rsc/netflows.pcapng", 2055);
-    // println!("Flowsets num: {}", flows.len());
 }

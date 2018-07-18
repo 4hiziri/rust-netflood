@@ -12,11 +12,6 @@ fn from_fields(id: u16, fields: &Vec<TypeLengthField>, count: usize) -> Vec<Data
             random_data.push(rand_field(fields));
         }
 
-        let record_len = random_data
-            .as_slice()
-            .into_iter()
-            .fold(0, |sum, rec| sum + rec.byte_length()) as u16;
-
         dataflow.push(DataFlow::new(id, random_data));
     }
 

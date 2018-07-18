@@ -12,8 +12,7 @@ fn get_udp_sock() -> Option<UdpSocket> {
     None
 }
 
-pub fn send_netflow(netflow: NetFlow9, dst_addr: &str, dst_port: u16) -> io::Result<usize> {
-    let dst_addr: IpAddr = dst_addr.parse().expect("Invalid IP address");
+pub fn send_netflow(netflow: NetFlow9, dst_addr: IpAddr, dst_port: u16) -> io::Result<usize> {
     let payload = netflow.to_bytes();
     let dst = format!("{}:{}", dst_addr, dst_port);
 
