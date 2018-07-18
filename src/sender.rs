@@ -1,5 +1,4 @@
 use netflow::netflow::NetFlow9;
-use std::io;
 use std::net::{IpAddr, UdpSocket};
 
 fn get_udp_sock() -> Option<UdpSocket> {
@@ -12,15 +11,15 @@ fn get_udp_sock() -> Option<UdpSocket> {
     None
 }
 
-pub fn send_netflow(netflow: NetFlow9, dst_addr: IpAddr, dst_port: u16) -> io::Result<usize> {
+pub fn send_netflow(netflow: NetFlow9, dst_addr: IpAddr, dst_port: u16) {
     let payload = netflow.to_bytes();
     let dst = format!("{}:{}", dst_addr, dst_port);
 
     debug!("Dst: {:?}", dst);
 
     if let Some(sock) = get_udp_sock() {
-        sock.send_to(&payload, dst)
+        sock.send_to(&payload, dst).expect("couldn't send data");
     } else {
-        Err(io::Error::from(io::ErrorKind::AlreadyExists))
+        panic!("cannot get socket");
     }
 }
