@@ -157,8 +157,7 @@ fn cmd_generate(matches: &ArgMatches) {
         flowsets,
     );
 
-    sender::send_netflow(flow1, dst_addr, 2055);
-    sender::send_netflow(flow2, dst_addr, 2055);
+    sender::send_netflow(&vec![flow1, flow2], dst_addr, 2055);
 }
 
 fn cmd_extract(matches: &ArgMatches) {

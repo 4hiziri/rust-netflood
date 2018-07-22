@@ -11,14 +11,13 @@ fn get_udp_sock() -> Option<UdpSocket> {
     None
 }
 
-pub fn send_netflow(netflow: NetFlow9, dst_addr: IpAddr, dst_port: u16) {
-    let payload = netflow.to_bytes();
-    let dst = format!("{}:{}", dst_addr, dst_port);
-
-    debug!("Dst: {:?}", dst);
-
+pub fn send_netflow(netflows: &Vec<NetFlow9>, dst_addr: IpAddr, dst_port: u16) {
     if let Some(sock) = get_udp_sock() {
-        sock.send_to(&payload, dst).expect("couldn't send data");
+        for flow in netflows {
+            println!("prev2");
+            sock.send_to(&flow.to_bytes(), &format!("{}:{}", dst_addr, dst_port))
+                .expect("couldn't send data");
+        }
     } else {
         panic!("cannot get socket");
     }
