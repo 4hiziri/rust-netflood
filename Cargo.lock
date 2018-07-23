@@ -192,7 +192,7 @@ dependencies = [
 [[package]]
 name = "netflow"
 version = "0.1.0"
-source = "git+https://github.com/4hiziri/rust-netflow.git#5457cfe5d3565651bf48d167e1b828e321d6a3e3"
+source = "git+https://github.com/4hiziri/rust-netflow.git#242ecce41c4cfb71100568dd31ae74a441b7ca1b"
 dependencies = [
  "byteorder 1.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.5.10 (registry+https://github.com/rust-lang/crates.io-index)",
