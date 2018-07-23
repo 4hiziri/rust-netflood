@@ -36,6 +36,10 @@ subcommands:
             help: Destination address
             required: true
             takes_value: true
+        - port:
+            help: Destination port, default is 2055
+            default_value: "2055"
+            takes_value: true
         - count:
             help: Num of dataflow per templates
             default_value: "1"

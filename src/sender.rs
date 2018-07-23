@@ -14,7 +14,6 @@ fn get_udp_sock() -> Option<UdpSocket> {
 pub fn send_netflow(netflows: &Vec<NetFlow9>, dst_addr: IpAddr, dst_port: u16) {
     if let Some(sock) = get_udp_sock() {
         for flow in netflows {
-            println!("prev2");
             sock.send_to(&flow.to_bytes(), &format!("{}:{}", dst_addr, dst_port))
                 .expect("couldn't send data");
         }

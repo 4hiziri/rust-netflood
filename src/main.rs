@@ -131,11 +131,17 @@ fn cmd_generate(matches: &ArgMatches) {
     flowsets.append(&mut opt_flows);
     templates.append(&mut opt_temps);
 
-    debug!("Templates: {:?}", templates);
-    debug!("FlowSets: {:?}", flowsets);
+    debug!("Templates count: {:?}", templates.len());
+    debug!("FlowSets count: {:?}", flowsets.len());
 
     let id = 1024;
     let seq_num = 256;
+    let dst_port = matches
+        .value_of("port")
+        .unwrap()
+        .parse::<u16>()
+        .expect("Invalid port");
+
     let flow1 = NetFlow9::new(
         100000,
         SystemTime::now()
@@ -157,7 +163,8 @@ fn cmd_generate(matches: &ArgMatches) {
         flowsets,
     );
 
-    sender::send_netflow(&vec![flow1, flow2], dst_addr, 2055);
+    sender::send_netflow(&vec![flow1, flow2], dst_addr, dst_port);
+    // println!("{}", seq_num + 1);
 }
 
 fn cmd_extract(matches: &ArgMatches) {
