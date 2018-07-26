@@ -33,7 +33,7 @@ fn test_rand_field() {
     temps.push(TypeLengthField::new(102, 8));
     temps.push(TypeLengthField::new(103, 5));
 
-    let record = rand_field(temps);
+    let record = rand_field(&temps);
 
     assert_eq!(record.to_bytes().len(), 19);
 }
