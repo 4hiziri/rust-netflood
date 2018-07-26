@@ -38,17 +38,21 @@ subcommands:
             takes_value: true
         - port:
             help: Destination port, default is 2055
+            short: p
             default_value: "2055"
             takes_value: true
         - count:
             help: Num of dataflow per templates
+            short: c
             default_value: "1"
             takes_value: true
         - id:
             help: Netflow source ID
+            long: id
             default_value: "1024"
             takes_value: true
         - seq-num:
             help: Netflow initial sequence num
+            short: s
             default_value: "10000"
             takes_value: true
