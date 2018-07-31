@@ -151,7 +151,7 @@ fn cmd_generate(matches: &ArgMatches) {
         .parse::<u16>()
         .expect("Invalid port");
 
-    // FIXME: Error at to_bytes of OptionTemplate
+    // FIXME: Error at length of template flowsetexit
     let flow1 = NetFlow9::new(
         100000,
         SystemTime::now()
@@ -173,8 +173,17 @@ fn cmd_generate(matches: &ArgMatches) {
         flowsets,
     );
 
-    debug!("Template Flow:\n{:?}", &flow1);
-    debug!("Data Flow:\n{:?}", &flow2);
+    // debug!("Template Flow:\n{:?}", &flow1);
+    // debug!("Data Flow:\n{:?}", &flow2);
+    for flowset in &flow1.flow_sets {
+        match flowset {
+            FlowSet::OptionTemplate(option) => {
+                debug!("Option Dump:\n{:?}", option);
+                debug!("Option bytes:\n{:?}", option.to_bytes());
+            }
+            _ => (),
+        }
+    }
 
     sender::send_netflow(&vec![flow1, flow2], dst_addr, dst_port);
     // println!("{}", seq_num + 1);
