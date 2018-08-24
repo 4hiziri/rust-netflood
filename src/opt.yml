@@ -42,8 +42,18 @@ subcommands:
             default_value: "2055"
             takes_value: true
         - count:
-            help: Num of dataflow per templates
+            help: Num of sending dataflow
             short: c
+            default_value: "1"
+            takes_value: true
+        - interval:
+            help: Sending interval
+            short: i
+            default_value: "1"
+            takes_value: true
+        - dataset_num:
+            help: Num of Netflow data by a packet
+            long: num
             default_value: "1"
             takes_value: true
         - id:
@@ -51,7 +61,7 @@ subcommands:
             long: id
             default_value: "1024"
             takes_value: true
-        - seq-num:
+        - seq_num:
             help: Netflow initial sequence num
             short: s
             default_value: "10000"

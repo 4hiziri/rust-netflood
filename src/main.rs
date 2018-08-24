@@ -21,7 +21,8 @@ use netflow::netflow::NetFlow9;
 
 use std::net::IpAddr;
 use std::str::FromStr;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::thread::sleep;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 // Need cmd
 // + send netflow by json, xml or something
@@ -116,43 +117,35 @@ fn generate_from_option_template(
     (flowsets, templates)
 }
 
+fn take_option_val<T>(matches: &ArgMatches, option_name: &str) -> T
+where
+    T: std::str::FromStr,
+    <T as std::str::FromStr>::Err: std::fmt::Debug,
+{
+    matches
+        .value_of(option_name)
+        .unwrap()
+        .parse::<T>()
+        .expect(&format!("Error while parsing {}", option_name))
+}
+
 // TODO: design arguments and set data
 fn cmd_generate(matches: &ArgMatches) {
-    let count = matches
-        .value_of("count")
-        .unwrap()
-        .parse::<usize>()
-        .expect("Error while parsing count");
+    let dataset_num: usize = take_option_val(matches, "dataset_num");
+    let count: u32 = take_option_val(matches, "count");
+    let interval: u64 = take_option_val(matches, "interval");
     let dst_addr = IpAddr::from_str(matches.value_of("dst-addr").unwrap())
         .expect("Error while parse dst-addr!");
-    let seq_num = matches
-        .value_of("seq-num")
-        .unwrap()
-        .parse::<u32>()
-        .expect("Error: invalid sequence number, -s");
-    let id = matches
-        .value_of("id")
-        .unwrap()
-        .parse::<u32>()
-        .expect("Error: invalid id, -i");
-    let (mut flowsets, mut templates) = generate_from_data_template(&matches, count);
-    let (mut opt_flows, mut opt_temps) = generate_from_option_template(&matches, count);
-    flowsets.append(&mut opt_flows);
+    let dst_port: u16 = take_option_val(matches, "port");
+    let seq_num: u32 = take_option_val(matches, "seq_num");
+    let id = take_option_val(matches, "id");
+
+    let (_, mut templates) = generate_from_data_template(&matches, dataset_num);
+    let (_, mut opt_temps) = generate_from_option_template(&matches, dataset_num);
+
     templates.append(&mut opt_temps);
 
-    debug!("Templates count: {:?}", templates.len());
-    debug!("FlowSets count: {:?}", flowsets.len());
-
-    let id = id;
-    let seq_num = seq_num;
-    let dst_port = matches
-        .value_of("port")
-        .unwrap()
-        .parse::<u16>()
-        .expect("Invalid port");
-
-    // FIXME: Error at length of template flowsetexit
-    let flow1 = NetFlow9::new(
+    let template_flow = NetFlow9::new(
         100000,
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -162,31 +155,30 @@ fn cmd_generate(matches: &ArgMatches) {
         id,
         templates,
     );
-    let flow2 = NetFlow9::new(
-        100000,
-        SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as u32,
-        seq_num + 1,
-        id,
-        flowsets,
-    );
 
-    // debug!("Template Flow:\n{:?}", &flow1);
-    // debug!("Data Flow:\n{:?}", &flow2);
-    for flowset in &flow1.flow_sets {
-        match flowset {
-            FlowSet::OptionTemplate(option) => {
-                debug!("Option Dump:\n{:?}", option);
-                debug!("Option bytes:\n{:?}", option.to_bytes());
-            }
-            _ => (),
-        }
+    sender::send_netflow(&vec![template_flow], &dst_addr, dst_port);
+
+    for i in 0..count {
+        // FIXME: Separate function
+        let (mut flowsets, _) = generate_from_data_template(&matches, dataset_num);
+        let (mut opt_flows, _) = generate_from_option_template(&matches, dataset_num);
+
+        flowsets.append(&mut opt_flows);
+
+        let data_flow = NetFlow9::new(
+            100000,
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs() as u32,
+            seq_num + i + 1,
+            id,
+            flowsets,
+        );
+
+        sender::send_netflow(&vec![data_flow], &dst_addr, dst_port);
+        sleep(Duration::from_secs(interval));
     }
-
-    sender::send_netflow(&vec![flow1, flow2], dst_addr, dst_port);
-    // println!("{}", seq_num + 1);
 }
 
 fn cmd_extract(matches: &ArgMatches) {
