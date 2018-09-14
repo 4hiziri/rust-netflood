@@ -16,7 +16,7 @@ use netflood::flow_generator::{from_option, from_template};
 use netflood::json_dump;
 use netflood::sender;
 use netflood::template_parser::{extract_option, extract_template};
-use netflow::flowset::{DataFlow, DataTemplate, FlowSet, OptionTemplate};
+use netflow::flowset::{DataFlow, DataTemplate, DataTemplateItem, FlowSet, OptionTemplate};
 use netflow::netflow::NetFlow9;
 
 use std::net::IpAddr;
@@ -28,9 +28,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 // + send netflow by json, xml or something
 
 fn get_template(template_file: &str) -> Option<DataTemplate> {
-    let temp_items = json_dump::json_template(template_file);
+    let temp_items: Vec<DataTemplateItem> = json_dump::json_template(template_file);
 
-    if temp_items.len() == 0 {
+    if temp_items.is_empty() {
         None
     } else {
         Some(DataTemplate::new(temp_items)) // delete dup
@@ -51,7 +51,7 @@ fn take_temp(count: usize, template: &DataTemplate) -> Vec<DataFlow> {
 fn get_option(option_file: &str) -> Option<Vec<OptionTemplate>> {
     let options = json_dump::json_option(option_file);
 
-    if options.len() == 0 {
+    if options.is_empty() {
         None
     } else {
         Some(
