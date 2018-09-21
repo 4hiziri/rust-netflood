@@ -66,3 +66,7 @@ subcommands:
             short: s
             default_value: "10000"
             takes_value: true
+        - no-padding:
+            help: Remove padding from each flowset, option and data.
+            short: n
+            default_value: "false"            

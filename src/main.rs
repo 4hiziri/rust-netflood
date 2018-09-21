@@ -63,7 +63,7 @@ fn get_option(option_file: &str) -> Option<Vec<OptionTemplate>> {
     }
 }
 
-fn take_opt(count: usize, options: &Vec<OptionTemplate>) -> Vec<DataFlow> {
+fn take_opt(count: usize, options: &[OptionTemplate]) -> Vec<DataFlow> {
     let mut dataflows = Vec::new();
     let options = options.iter().map(|opt| &opt.templates);
 
@@ -126,7 +126,7 @@ where
         .value_of(option_name)
         .unwrap()
         .parse::<T>()
-        .expect(&format!("Error while parsing {}", option_name))
+        .unwrap_or_else(|_| panic!("Error while parsing {}", option_name))
 }
 
 // TODO: design arguments and set data
@@ -139,6 +139,7 @@ fn cmd_generate(matches: &ArgMatches) {
     let dst_port: u16 = take_option_val(matches, "port");
     let seq_num: u32 = take_option_val(matches, "seq_num");
     let id = take_option_val(matches, "id");
+    let is_no_padding: bool = take_option_val(matches, "no-padding");
 
     let (_, mut templates) = generate_from_data_template(&matches, dataset_num);
     let (_, mut opt_temps) = generate_from_option_template(&matches, dataset_num);
@@ -165,7 +166,7 @@ fn cmd_generate(matches: &ArgMatches) {
 
         flowsets.append(&mut opt_flows);
 
-        let data_flow = NetFlow9::new(
+        let mut data_flow = NetFlow9::new(
             100000,
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
@@ -175,6 +176,8 @@ fn cmd_generate(matches: &ArgMatches) {
             id,
             flowsets,
         );
+
+        data_flow.set_padding(!is_no_padding);
 
         sender::send_netflow(&vec![data_flow], &dst_addr, dst_port);
         sleep(Duration::from_secs(interval));
