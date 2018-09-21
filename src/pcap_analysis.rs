@@ -22,7 +22,7 @@ struct Error {
 
 impl Error {
     pub fn new(layer: u8) -> Error {
-        Error { layer: layer }
+        Error { layer }
     }
 }
 

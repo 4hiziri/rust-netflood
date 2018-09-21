@@ -4,13 +4,13 @@ use serde_json::Error;
 use std::fs::File;
 use std::io::BufReader;
 
-pub fn dump_template(template: &Vec<DataTemplateItem>) -> Result<String, Error> {
+pub fn dump_template(template: &[DataTemplateItem]) -> Result<String, Error> {
     let val = json!(template);
 
     Ok(val.to_string())
 }
 
-pub fn dump_option(option: &Vec<OptionTemplateItem>) -> Result<String, Error> {
+pub fn dump_option(option: &[OptionTemplateItem]) -> Result<String, Error> {
     let val = json!(option);
 
     Ok(val.to_string())

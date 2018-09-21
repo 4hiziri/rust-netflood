@@ -4,6 +4,7 @@ extern crate pnet;
 #[macro_use]
 extern crate serde_json;
 extern crate rand;
+#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
 

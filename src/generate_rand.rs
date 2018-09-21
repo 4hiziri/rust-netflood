@@ -2,7 +2,7 @@ use netflow::field::{FieldValue, FlowField, TypeLengthField};
 use netflow::flowset::Record;
 use rand::prelude::*;
 
-pub fn rand_field(templates: &Vec<TypeLengthField>) -> Record {
+pub fn rand_field(templates: &[TypeLengthField]) -> Record {
     let mut records: Vec<FlowField> = Vec::with_capacity(templates.len());
 
     for template in templates {

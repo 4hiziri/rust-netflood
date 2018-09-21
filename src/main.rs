@@ -54,12 +54,7 @@ fn get_option(option_file: &str) -> Option<Vec<OptionTemplate>> {
     if options.is_empty() {
         None
     } else {
-        Some(
-            options
-                .into_iter()
-                .map(|option| OptionTemplate::new(option))
-                .collect(),
-        )
+        Some(options.into_iter().map(OptionTemplate::new).collect())
     }
 }
 
@@ -157,7 +152,7 @@ fn cmd_generate(matches: &ArgMatches) {
         templates,
     );
 
-    sender::send_netflow(&vec![template_flow], &dst_addr, dst_port);
+    sender::send_netflow(&[template_flow], &dst_addr, dst_port);
 
     for i in 0..count {
         // FIXME: Separate function
@@ -179,7 +174,7 @@ fn cmd_generate(matches: &ArgMatches) {
 
         data_flow.set_padding(!is_no_padding);
 
-        sender::send_netflow(&vec![data_flow], &dst_addr, dst_port);
+        sender::send_netflow(&[data_flow], &dst_addr, dst_port);
         sleep(Duration::from_secs(interval));
     }
 }

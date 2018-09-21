@@ -22,16 +22,13 @@ fn from_reader(template_reader: &mut Read) -> Result<DataTemplate, serde_json::E
     }
 }
 
-fn is_contained_template(vec: &Vec<DataTemplateItem>, item: &DataTemplateItem) -> bool {
-    vec.into_iter().fold(false, |is_contained, i| {
-        is_contained || i.template_id == item.template_id
-    })
+fn is_contained_template(vec: &[DataTemplateItem], item: &DataTemplateItem) -> bool {
+    vec.into_iter().any(|i| i.template_id == item.template_id)
 }
 
-fn is_contained_option(vec: &Vec<OptionTemplateItem>, item: &OptionTemplate) -> bool {
-    vec.into_iter().fold(false, |is_contained, i| {
-        is_contained || i.template_id == item.templates.template_id
-    })
+fn is_contained_option(vec: &[OptionTemplateItem], item: &OptionTemplate) -> bool {
+    vec.into_iter()
+        .any(|i| i.template_id == item.templates.template_id)
 }
 
 // Return DataTemplateItem for extract and dump template
@@ -53,7 +50,7 @@ pub fn extract_template(filename: &str) -> Vec<DataTemplateItem> {
         .flat_map(|data_temp| data_temp.templates);
 
     // remove duplicates
-    templates.into_iter().fold(Vec::new(), |mut acc, item| {
+    templates.fold(Vec::new(), |mut acc, item| {
         if is_contained_template(&acc, &item) {
             acc
         } else {
@@ -75,7 +72,7 @@ pub fn extract_option(filename: &str) -> Vec<OptionTemplateItem> {
         });
 
     // remove duplicates
-    option.into_iter().fold(Vec::new(), |mut acc, item| {
+    option.fold(Vec::new(), |mut acc, item| {
         if is_contained_option(&acc, &item) {
             acc
         } else {

@@ -2,7 +2,7 @@ use generate_rand::rand_field;
 use netflow::field::TypeLengthField;
 use netflow::flowset::{DataFlow, DataTemplateItem, OptionTemplateItem};
 
-fn from_fields(id: u16, fields: &Vec<TypeLengthField>, count: usize) -> Vec<DataFlow> {
+fn from_fields(id: u16, fields: &[TypeLengthField], count: usize) -> Vec<DataFlow> {
     let mut dataflow = Vec::with_capacity(count);
 
     for _ in 0..count {
