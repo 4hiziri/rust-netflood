@@ -70,3 +70,12 @@ subcommands:
             help: Remove padding from each flowset, option and data.
             short: n
             default_value: "false"            
+  - reply:
+      about: Reply netflow
+      visible_alias: r
+      args:
+        - in:
+            help: pcap file including netflow
+            short: i
+            takes_value: true
+            
