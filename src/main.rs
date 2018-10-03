@@ -1,4 +1,3 @@
-// https://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html
 extern crate netflood;
 extern crate netflow;
 extern crate rand;
@@ -47,7 +46,7 @@ fn take_temp(count: usize, template: &DataTemplate) -> Vec<DataFlow> {
     dataflows
 }
 
-// FIXME: option is one at system?
+// FIXME: is option specific to a system?
 fn get_option(option_file: &str) -> Option<Vec<OptionTemplate>> {
     let options = json_dump::json_option(option_file);
 
@@ -124,7 +123,6 @@ where
         .unwrap_or_else(|_| panic!("Error while parsing {}", option_name))
 }
 
-// TODO: design arguments and set data
 fn cmd_generate(matches: &ArgMatches) {
     let dataset_num: usize = take_option_val(matches, "dataset_num");
     let count: u32 = take_option_val(matches, "count");
