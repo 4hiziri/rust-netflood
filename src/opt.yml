@@ -2,7 +2,7 @@ name: netflood
 subcommands:
   - extract:
       abount: Extract netflow information from pcap file
-      visible_alias: e      
+      visible_alias: e
       subcommands:
         - template:
             about: extract Data Template flowsets
@@ -22,12 +22,12 @@ subcommands:
       about: Generate netflow and send
       visible_alias: g
       args:
-        - template:            
+        - template:
             help: Data template json to generate netflow v9 packet
             short: t
             takes_value: true
             multiple: true
-        - option:            
+        - option:
             help: Option template json to generate netflow v9 packet
             short: o
             takes_value: true
@@ -69,13 +69,12 @@ subcommands:
         - no-padding:
             help: Remove padding from each flowset, option and data.
             short: n
-            default_value: "false"            
+            default_value: "false"
   - reply:
-      about: Reply netflow
+      about: Reply netflow packets
       visible_alias: r
       args:
         - in:
             help: pcap file including netflow
             short: i
             takes_value: true
-            
