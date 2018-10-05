@@ -13,6 +13,7 @@ use clap::{App, ArgMatches};
 
 use netflood::flow_generator::{from_option, from_template};
 use netflood::json_dump;
+use netflood::pcap_analysis;
 use netflood::sender;
 use netflood::template_parser::{extract_option, extract_template};
 use netflow::flowset::{DataFlow, DataTemplate, DataTemplateItem, FlowSet, OptionTemplate};
@@ -211,6 +212,27 @@ fn cmd_extract(matches: &ArgMatches) {
     }
 }
 
+fn cmd_reply(matches: &ArgMatches) {
+    let pcap = matches.value_of("PCAP").unwrap();
+    let is_update: bool = take_option_val(matches, "update");
+    let port: u16 = take_option_val(matches, "port");
+
+    let bytes_vec: Vec<Vec<u8>> = pcap_analysis::dump_netflow(pcap, port);
+
+    if is_update {
+        println!("Not impl!");
+    } else {
+        let netflows: Vec<NetFlow9> = bytes_vec
+            .into_iter()
+            .map(|bytes| netflow::netflow::NetFlow9::from_bytes(bytes.as_slice()))
+            .filter(|res| res.is_ok())
+            .map(|res| res.unwrap())
+            .collect();
+
+        println!("dump netflow: {:?}", netflows);
+    }
+}
+
 fn main() {
     env_logger::init();
 
@@ -224,14 +246,19 @@ fn main() {
 
     match matches.subcommand() {
         ("extract", Some(matches)) => {
-            debug!("extract cmd");
+            debug!("subcommand: extract");
 
             cmd_extract(matches);
         }
         ("generate", Some(matches)) => {
-            debug!("generate cmd");
+            debug!("subcommand: generate");
 
             cmd_generate(matches);
+        }
+        ("reply", Some(matches)) => {
+            debug!("subcommand: reply");
+
+            cmd_reply(matches);
         }
         _ => println!("{}", matches.usage()),
     }

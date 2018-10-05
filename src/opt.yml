@@ -74,7 +74,15 @@ subcommands:
       about: Reply netflow packets
       visible_alias: r
       args:
-        - in:
+        - PCAP:
             help: pcap file including netflow
-            short: i
+            required: true
             takes_value: true
+        - update:
+            help: update timestamp
+            takes_value: true
+            default_value: "true"
+        - port:
+            help: port collectiong netflow
+            takes_value: true
+            default_value: "2055"
