@@ -1,3 +1,5 @@
+#![feature(dbg_macro)]
+
 extern crate netflood;
 extern crate netflow;
 extern crate rand;
@@ -214,14 +216,15 @@ fn cmd_extract(matches: &ArgMatches) {
 
 fn cmd_reply(matches: &ArgMatches) {
     let pcap = matches.value_of("PCAP").unwrap();
-    let is_update: bool = take_option_val(matches, "update");
+    let is_update: bool = matches.is_present("update");
     let port: u16 = take_option_val(matches, "port");
 
     let bytes_vec: Vec<Vec<u8>> = pcap_analysis::dump_netflow(pcap, port);
 
-    if is_update {
-        println!("Not impl!");
+    let netflows = if is_update {
+        panic!("Not impl!");
     } else {
+        // TODO: update dst ip, port
         let netflows: Vec<NetFlow9> = bytes_vec
             .into_iter()
             .map(|bytes| netflow::netflow::NetFlow9::from_bytes(bytes.as_slice()))
@@ -229,8 +232,9 @@ fn cmd_reply(matches: &ArgMatches) {
             .map(|res| res.unwrap())
             .collect();
 
-        println!("dump netflow: {:?}", netflows);
-    }
+        debug!("dump netflow: {:?}", &netflows);
+        netflows
+    };
 }
 
 fn main() {

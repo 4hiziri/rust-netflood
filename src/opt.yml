@@ -80,8 +80,6 @@ subcommands:
             takes_value: true
         - update:
             help: update timestamp
-            takes_value: true
-            default_value: "true"
         - port:
             help: port collectiong netflow
             takes_value: true
