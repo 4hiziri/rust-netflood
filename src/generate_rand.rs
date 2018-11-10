@@ -24,7 +24,7 @@ pub fn rand_field(templates: &[TypeLengthField]) -> Record {
 
 #[test]
 fn test_rand_field() {
-    use generate_rand::rand_field;
+    use crate::generate_rand::rand_field;
     use netflow::field::TypeLengthField;
 
     let mut temps = Vec::new();

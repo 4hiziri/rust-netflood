@@ -123,6 +123,7 @@ where
         .unwrap_or_else(|_| panic!("Error while parsing {}", option_name))
 }
 
+#[cfg_attr(feature = "cargo-clippy", allow(clippy::unreadable_literal))]
 fn cmd_generate(matches: &ArgMatches) {
     let dataset_num: usize = take_option_val(matches, "dataset_num");
     let count: u32 = take_option_val(matches, "count");

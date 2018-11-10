@@ -2,7 +2,7 @@ use netflow::flowset::{
     DataTemplate, DataTemplateItem, FlowSet, OptionTemplate, OptionTemplateItem,
 };
 use netflow::netflow::NetFlow9;
-use pcap_analysis;
+use crate::pcap_analysis;
 use serde_json;
 use std::io::Read;
 

@@ -1,4 +1,4 @@
-use generate_rand::rand_field;
+use crate::generate_rand::rand_field;
 use netflow::field::TypeLengthField;
 use netflow::flowset::{DataFlow, DataTemplateItem, OptionTemplateItem};
 
