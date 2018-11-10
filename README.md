@@ -1,7 +1,7 @@
 # Netflood
 Netflow v9 packet generator.
 
-This can extract Netflow v9 packets from pcap and dump template information to json.
+This can extract Netflow v9 packets from pcap and dump template information to json.  
 And this generates Netflow v9 packets with random values depending on such template information.
 
 # Usage
@@ -20,7 +20,7 @@ cargo run extract template netflows.pcapng > template.json
 cargo run extract option netflows.pcapng > option.json
 ```
 
-This command assumes packets of 2055/udp are Netflow.
+This command assumes packets of 2055/udp are Netflow.  
 I will add port specifying option later.
 
 Extracted json samples are in ./sample/.
@@ -33,10 +33,10 @@ Netflow v9 packets generation.
 cargo run generate 192.168.1.101 -t sample/template.json -o sample/option.json -i 3 -c 1000 -s 10001 -p 2055 -n
 ```
 
-`-t`: Specify template information
-`-o`: Specify option template information
-`-i`: Interval to send next packet
-`-c`: Num of sending packets
-`-s`: Initial Sequence number of a Netflow packet
-`-p`: Port
-`-n`: Not adding padding. Netflow v9 specification(RFC 3954) saies that the exporter "SHOULD" insert padding, but not "MUST".
++ `-t`: Specify template information
++ `-o`: Specify option template information
++ `-i`: Interval to send next packet
++ `-c`: Num of sending packets
++ `-s`: Initial Sequence number of a Netflow packet
++ `-p`: Port
++ `-n`: Not adding padding. Netflow v9 specification(RFC 3954) saies that the exporter "SHOULD" insert padding, but not "MUST".
