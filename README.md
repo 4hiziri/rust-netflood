@@ -39,4 +39,4 @@ cargo run generate 192.168.1.101 -t sample/template.json -o sample/option.json -
 + `-c`: Num of sending packets
 + `-s`: Initial Sequence number of a Netflow packet
 + `-p`: Port
-+ `-n`: Not adding padding. Netflow v9 specification(RFC 3954) saies that the exporter "SHOULD" insert padding, but not "MUST".
++ `-n`: Not adding padding. Netflow v9 specification(RFC 3954) says that the exporter "SHOULD" insert padding, but not "MUST".
