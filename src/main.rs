@@ -227,8 +227,9 @@ fn cmd_reply(matches: &ArgMatches) {
     } else {
         // TODO: update dst ip, port
         let netflows: Vec<NetFlow9> = bytes_vec
+            .as_slice()
             .into_iter()
-            .map(|bytes| netflow::netflow::NetFlow9::from_bytes(bytes.as_slice()))
+            .map(|bytes| netflow::netflow::NetFlow9::from_bytes(bytes))
             .filter(|res| res.is_ok())
             .map(|res| res.unwrap())
             .collect();
