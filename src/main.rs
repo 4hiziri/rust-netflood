@@ -181,27 +181,28 @@ fn cmd_generate(matches: &ArgMatches) {
     }
 }
 
+// TODO: add human-readable format
 fn cmd_extract(matches: &ArgMatches) {
-    // TODO: add human-readable format
     match matches.subcommand() {
         ("template", Some(matches)) => {
             debug!("extract template");
 
             let pcap = matches.value_of("PCAP").unwrap();
-            let templates = extract_template(pcap);
+            let port: u16 = take_option_val(matches, "port");
+            let templates = extract_template(pcap, port);
 
             debug!("len: {:?}", templates.len());
             debug!("netflows: {:?}", templates[0]);
 
             let temp_json = json_dump::dump_template(&templates).unwrap();
-
             println!("{}", &temp_json);
         }
         ("option", Some(matches)) => {
             debug!("extract option");
 
             let pcap = matches.value_of("PCAP").unwrap();
-            let options = extract_option(pcap);
+            let port: u16 = take_option_val(matches, "port");
+            let options = extract_option(pcap, port);
 
             debug!("len: {:?}", options.len());
             debug!("netflows: {:?}", options[0]);
@@ -222,7 +223,7 @@ fn cmd_reply(matches: &ArgMatches) {
 
     let bytes_vec: Vec<Vec<u8>> = pcap_analysis::dump_netflow(pcap, port);
 
-    let netflows = if is_update {
+    let _netflows = if is_update {
         panic!("Not impl!");
     } else {
         // TODO: update dst ip, port

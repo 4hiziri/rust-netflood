@@ -1,8 +1,8 @@
+use crate::pcap_analysis;
 use netflow::flowset::{
     DataTemplate, DataTemplateItem, FlowSet, OptionTemplate, OptionTemplateItem,
 };
 use netflow::netflow::NetFlow9;
-use crate::pcap_analysis;
 use serde_json;
 use std::io::Read;
 
@@ -32,8 +32,8 @@ fn is_contained_option(vec: &[OptionTemplateItem], item: &OptionTemplate) -> boo
 }
 
 // Return DataTemplateItem for extract and dump template
-pub fn extract_template(filename: &str) -> Vec<DataTemplateItem> {
-    let templates = pcap_analysis::dump_netflow(filename, 2055)
+pub fn extract_template(filename: &str, port: u16) -> Vec<DataTemplateItem> {
+    let templates = pcap_analysis::dump_netflow(filename, port)
         .into_iter()
         .map(|packets| NetFlow9::from_bytes(&packets).unwrap())
         .flat_map(|netflow| {
@@ -60,8 +60,8 @@ pub fn extract_template(filename: &str) -> Vec<DataTemplateItem> {
     })
 }
 
-pub fn extract_option(filename: &str) -> Vec<OptionTemplateItem> {
-    let option = pcap_analysis::dump_netflow(filename, 2055)
+pub fn extract_option(filename: &str, port: u16) -> Vec<OptionTemplateItem> {
+    let option = pcap_analysis::dump_netflow(filename, port)
         .into_iter()
         .map(|packets| NetFlow9::from_bytes(&packets).unwrap())
         .flat_map(|netflow| {

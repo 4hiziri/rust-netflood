@@ -1,6 +1,6 @@
 name: netflood
 subcommands:
-  - extract:
+  - extract:      
       abount: Extract netflow information from pcap file
       visible_alias: e
       subcommands:
@@ -11,6 +11,11 @@ subcommands:
                   help: pcap file
                   required: true
                   index: 1
+              - port:
+                  help: Listen port which receive NetFlow
+                  short: p
+                  takes_value: true
+                  default_value: "2055"
         - option:
             about: extract Option Template flowsets
             args:
@@ -18,6 +23,11 @@ subcommands:
                   help: pcap file
                   required: true
                   index: 1
+              - port:
+                  help: Listen port which receive NetFlow
+                  short: p
+                  takes_value: true
+                  default_value: "2055"
   - generate:
       about: Generate netflow and send
       visible_alias: g

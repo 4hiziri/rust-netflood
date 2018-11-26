@@ -20,8 +20,10 @@ cargo run extract template netflows.pcapng > template.json
 cargo run extract option netflows.pcapng > option.json
 ```
 
-This command assumes packets of 2055/udp are Netflow.  
-I will add port specifying option later.
+~~This command assumes packets of 2055/udp are Netflow.~~  
+~~I will add port specifying option later.~~
+
+Use `-p` option to specify the port which listen Netflow.
 
 Extracted json samples are in ./sample/.
 
