@@ -128,7 +128,7 @@ where
 fn cmd_generate(matches: &ArgMatches) {
     let dataset_num: usize = take_option_val(matches, "dataset_num");
     let count: u32 = take_option_val(matches, "count");
-    let interval: u64 = take_option_val(matches, "interval");
+    let interval: f32 = take_option_val(matches, "interval");
     let dst_addr = IpAddr::from_str(matches.value_of("dst-addr").unwrap())
         .expect("Error while parse dst-addr!");
     let dst_port: u16 = take_option_val(matches, "port");
@@ -175,7 +175,7 @@ fn cmd_generate(matches: &ArgMatches) {
         data_flow.set_padding(!is_no_padding);
 
         sender::send_netflow(&[data_flow], &dst_addr, dst_port);
-        sleep(Duration::from_secs(interval));
+        sleep(Duration::from_secs_f32(interval));
     }
 }
 
