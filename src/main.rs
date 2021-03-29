@@ -154,13 +154,12 @@ fn cmd_generate(matches: &ArgMatches) {
 
     sender::send_netflow(&[template_flow], &dst_addr, dst_port);
 
+    // FIXME: Separate function
+    let (mut flowsets, _) = generate_from_data_template(&matches, dataset_num);
+    let (mut opt_flows, _) = generate_from_option_template(&matches, dataset_num);
+    flowsets.append(&mut opt_flows);
+
     for i in 0..count {
-        // FIXME: Separate function
-        let (mut flowsets, _) = generate_from_data_template(&matches, dataset_num);
-        let (mut opt_flows, _) = generate_from_option_template(&matches, dataset_num);
-
-        flowsets.append(&mut opt_flows);
-
         let mut data_flow = NetFlow9::new(
             100000,
             SystemTime::now()
@@ -169,7 +168,7 @@ fn cmd_generate(matches: &ArgMatches) {
                 .as_secs() as u32,
             seq_num + i + 1,
             id,
-            flowsets,
+            flowsets.clone(),
         );
 
         data_flow.set_padding(!is_no_padding);
