@@ -1,5 +1,3 @@
-#![feature(dbg_macro)]
-
 extern crate netflood;
 extern crate netflow;
 extern crate rand;
