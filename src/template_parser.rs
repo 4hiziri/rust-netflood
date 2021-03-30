@@ -15,8 +15,8 @@ fn from_str(template_str: &str) -> Result<DataTemplate, serde_json::Error> {
 }
 
 #[allow(dead_code)]
-fn from_reader(template_reader: &mut Read) -> Result<DataTemplate, serde_json::Error> {
-    match serde_json::from_reader::<&mut Read, serde_json::Value>(template_reader) {
+fn from_reader(template_reader: &mut dyn Read) -> Result<DataTemplate, serde_json::Error> {
+    match serde_json::from_reader::<&mut dyn Read, serde_json::Value>(template_reader) {
         Ok(_val) => Ok(DataTemplate::new(Vec::new())),
         Err(e) => Err(e),
     }
